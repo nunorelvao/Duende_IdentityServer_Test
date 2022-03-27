@@ -1,8 +1,8 @@
 ﻿using Duende.IdentityServer.Models;
 
-namespace Web_IDS.Models
+namespace Web_IDS.StaticConfig
 {
-    public static class Config
+    public static class StaticConfig
     {
         public static IEnumerable<IdentityResource> IdentityResources => new[]
           {

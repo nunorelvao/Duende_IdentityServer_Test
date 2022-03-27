@@ -1,6 +1,6 @@
 using Duende.IdentityServer;
 using Microsoft.EntityFrameworkCore;
-using Web_IDS.Models;
+using Web_IDS.StaticConfig;
 
 
 var seed = args.Contains("/seed");
@@ -64,10 +64,10 @@ builder.Services.AddIdentityServer(options =>
             options.EmitStaticAudienceClaim = true;
 
         }).AddTestUsers(TestUsers.Users)
-        //.AddInMemoryClients(Config.Clients) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryApiResources(Config.ApiResources) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryApiScopes(Config.ApiScopes) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryIdentityResources(Config.IdentityResources) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryClients(StaticConfig.Clients) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryApiResources(StaticConfig.ApiResources) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryApiScopes(StaticConfig.ApiScopes) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryIdentityResources(StaticConfig.IdentityResources) //This are in memory Stores to test and used in seed initial data
 
         .AddConfigurationStore(options =>
         {
@@ -89,7 +89,7 @@ if (seed)
 {
     Console.WriteLine("Start Seeding Database...");
 
-    Web_IDS.SeedData.EnsureSeedData(app);
+    Web_IDS.StaticConfig.SeedData.EnsureSeedData(app);
 
     Console.WriteLine("Done Seeding Database...");
 

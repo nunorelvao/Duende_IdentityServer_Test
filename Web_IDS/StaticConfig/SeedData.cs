@@ -2,9 +2,9 @@
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Duende.IdentityServer.Models;
 using Microsoft.EntityFrameworkCore;
-using Web_IDS.Models;
 
-namespace Web_IDS
+
+namespace Web_IDS.StaticConfig
 {
     public class SeedData
     {
@@ -12,7 +12,7 @@ namespace Web_IDS
         private static ILoggerFactory _loggerFactory = LoggerFactory.Create(c => c.SetMinimumLevel(LogLevel.Debug));
         public static void EnsureSeedData(WebApplication app)
         {
-            _logger = _loggerFactory.CreateLogger("ds");
+            _logger = _loggerFactory.CreateLogger("SeedData");
 
             using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
@@ -29,7 +29,7 @@ namespace Web_IDS
             if (!context.Clients.Any())
             {
                 _logger.LogDebug("Clients being populated");
-                foreach (var client in Config.Clients.ToList())
+                foreach (var client in StaticConfig.Clients.ToList())
                 {
                     context.Clients.Add(client.ToEntity());
                 }
@@ -43,7 +43,7 @@ namespace Web_IDS
             if (!context.IdentityResources.Any())
             {
                 _logger.LogDebug("IdentityResources being populated");
-                foreach (var resource in Config.IdentityResources.ToList())
+                foreach (var resource in StaticConfig.IdentityResources.ToList())
                 {
                     context.IdentityResources.Add(resource.ToEntity());
                 }
@@ -57,7 +57,7 @@ namespace Web_IDS
             if (!context.ApiScopes.Any())
             {
                 _logger.LogDebug("ApiScopes being populated");
-                foreach (var resource in Config.ApiScopes.ToList())
+                foreach (var resource in StaticConfig.ApiScopes.ToList())
                 {
                     context.ApiScopes.Add(resource.ToEntity());
                 }
@@ -71,7 +71,7 @@ namespace Web_IDS
             if (!context.ApiResources.Any())
             {
                 _logger.LogDebug("ApiResources being populated");
-                foreach (var resource in Config.ApiResources.ToList())
+                foreach (var resource in StaticConfig.ApiResources.ToList())
                 {
                     context.ApiResources.Add(resource.ToEntity());
                 }

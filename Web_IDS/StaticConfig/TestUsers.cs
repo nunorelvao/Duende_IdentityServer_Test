@@ -4,7 +4,7 @@ using IdentityModel;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Web_IDS.Models
+namespace Web_IDS.StaticConfig
 {
     public class TestUsers
     {
