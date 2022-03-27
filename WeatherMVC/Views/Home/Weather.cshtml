@@ -1,0 +1,45 @@
+﻿@model List<WeatherMVC.Models.WeatherDataModel>
+
+@{
+    ViewData["Title"] = "Weather API Data";
+}
+
+<h1>Weather</h1>
+
+<div>
+    @User?.Identity?.Name - @String.Join(':',  User?.Claims);
+    <h4>Weather Data</h4>
+    <hr />
+
+    @for (int i  = 0; i < Model.Count(); i++)  
+    {
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model[i].Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model[i].Date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model[i].TemperatureC)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model[i].TemperatureC)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model[i].TemperatureF)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model[i].TemperatureF)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model[i].Summary)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model[i].Summary)
+        </dd>
+    </dl>
+    }
+
+</div>
