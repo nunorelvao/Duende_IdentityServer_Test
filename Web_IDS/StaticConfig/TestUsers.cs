@@ -26,7 +26,7 @@ namespace Web_IDS.StaticConfig
                     {
                         SubjectId = "43546",
                         Username = "admin",
-                        Password = "admin",
+                        Password = "Admin!123",
                         Claims =
                         {
                             new Claim(JwtClaimTypes.Role, "admin"),
@@ -43,7 +43,7 @@ namespace Web_IDS.StaticConfig
                     {
                         SubjectId = "818727",
                         Username = "alice",
-                        Password = "alice",
+                        Password = "Alice!123",
                         Claims =
                         {
                             new Claim(JwtClaimTypes.Role, "user"),
@@ -60,7 +60,7 @@ namespace Web_IDS.StaticConfig
                     {
                         SubjectId = "88421113",
                         Username = "bob",
-                        Password = "bob",
+                        Password = "Bob!123",
                         Claims =
                         {
                             new Claim(JwtClaimTypes.Role, "user"),

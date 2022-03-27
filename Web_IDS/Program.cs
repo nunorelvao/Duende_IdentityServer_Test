@@ -1,5 +1,8 @@
 using Duende.IdentityServer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Web_IDS.Data;
+using Web_IDS.Models;
 using Web_IDS.StaticConfig;
 
 
@@ -50,6 +53,11 @@ builder.Services.AddAuthentication()
           options.Scope.Add("user:email");
       });
 
+//add AspNet Identity support
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+
 //get connectionString from Config
 var connString = builder.Configuration.GetConnectionString("SQLiteConString");
 var asseblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
@@ -63,12 +71,13 @@ builder.Services.AddIdentityServer(options =>
 
             options.EmitStaticAudienceClaim = true;
 
-        }).AddTestUsers(TestUsers.Users)
+        })
+        //.AddTestUsers(TestUsers.Users) //This are in memory Stores to test and used in seed initial data
         //.AddInMemoryClients(StaticConfig.Clients) //This are in memory Stores to test and used in seed initial data
         //.AddInMemoryApiResources(StaticConfig.ApiResources) //This are in memory Stores to test and used in seed initial data
         //.AddInMemoryApiScopes(StaticConfig.ApiScopes) //This are in memory Stores to test and used in seed initial data
         //.AddInMemoryIdentityResources(StaticConfig.IdentityResources) //This are in memory Stores to test and used in seed initial data
-
+        .AddAspNetIdentity<ApplicationUser>()
         .AddConfigurationStore(options =>
         {
 
@@ -81,6 +90,14 @@ builder.Services.AddIdentityServer(options =>
 
         .AddDeveloperSigningCredential();
 
+//Add DbContext for Identity
+var aspNetCoreIdentityconnString = builder.Configuration.GetConnectionString("SQLiteIdentityAspNetCoreConString");
+builder.Services.AddDbContext<Web_IDS.Data.ApplicationDbContext>(options =>
+{
+    options.UseSqlite(aspNetCoreIdentityconnString, options => options.MigrationsAssembly(asseblyName));
+});
+
+
 
 //build app
 var app = builder.Build();
@@ -89,9 +106,17 @@ if (seed)
 {
     Console.WriteLine("Start Seeding Database...");
 
-    Web_IDS.StaticConfig.SeedData.EnsureSeedData(app);
+   // Web_IDS.StaticConfig.SeedData.EnsureSeedData(app);
 
     Console.WriteLine("Done Seeding Database...");
+
+    Console.WriteLine("Start Identity AspNet Seeding Database...");
+
+    Web_IDS.StaticConfig.SeedAspNetUsers.EnsureUsersData(app);
+
+    Console.WriteLine("Done Identity AspNet Seeding Database...");
+
+
 
 }
 

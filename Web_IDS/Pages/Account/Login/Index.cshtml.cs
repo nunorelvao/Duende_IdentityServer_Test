@@ -6,8 +6,10 @@ using Duende.IdentityServer.Stores;
 using Duende.IdentityServer.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Web_IDS.Models;
 
 namespace DuendeIdentityServer.Pages.Login;
 
@@ -15,12 +17,15 @@ namespace DuendeIdentityServer.Pages.Login;
 [AllowAnonymous]
 public class Index : PageModel
 {
-    private readonly TestUserStore _users;
+    //private readonly TestUserStore _users;
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IClientStore _clientStore;
-    private readonly IEventService _events;
+    private readonly IEventService _events;    
     private readonly IAuthenticationSchemeProvider _schemeProvider;
     private readonly IIdentityProviderStore _identityProviderStore;
+    //add because of Identity
+    private readonly SignInManager<ApplicationUser> _signInManager;
+
 
     public ViewModel View { get; set; }
         
@@ -33,16 +38,18 @@ public class Index : PageModel
         IAuthenticationSchemeProvider schemeProvider,
         IIdentityProviderStore identityProviderStore,
         IEventService events,
-        TestUserStore users = null)
+        //TestUserStore users = null
+        SignInManager<ApplicationUser> signInManager)
     {
         // this is where you would plug in your own custom identity management library (e.g. ASP.NET Identity)
-        _users = users ?? throw new Exception("Please call 'AddTestUsers(TestUsers.Users)' on the IIdentityServerBuilder in Startup or remove the TestUserStore from the AccountController.");
+        //_users = users ?? throw new Exception("Please call 'AddTestUsers(TestUsers.Users)' on the IIdentityServerBuilder in Startup or remove the TestUserStore from the AccountController.");
             
         _interaction = interaction;
         _clientStore = clientStore;
         _schemeProvider = schemeProvider;
         _identityProviderStore = identityProviderStore;
         _events = events;
+        _signInManager = signInManager;
     }
         
     public async Task<IActionResult> OnGet(string returnUrl)
@@ -92,11 +99,14 @@ public class Index : PageModel
 
         if (ModelState.IsValid)
         {
+            var user = await _signInManager.UserManager.FindByNameAsync(Input.Username);
+
             // validate username/password against in-memory store
-            if (_users.ValidateCredentials(Input.Username, Input.Password))
+            //if (_users.ValidateCredentials(Input.Username, Input.Password))
+            if (user != null && (await _signInManager.CheckPasswordSignInAsync(user, Input.Password, true)) == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
-                var user = _users.FindByUsername(Input.Username);
-                await _events.RaiseAsync(new UserLoginSuccessEvent(user.Username, user.SubjectId, user.Username, clientId: context?.Client.ClientId));
+                //var user = _users.FindByUsername(Input.Username);
+                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
 
                 // only set explicit expiration here if user chooses "remember me". 
                 // otherwise we rely upon expiration configured in cookie middleware.
@@ -111,9 +121,9 @@ public class Index : PageModel
                 };
 
                 // issue authentication cookie with subject ID and username
-                var isuser = new IdentityServerUser(user.SubjectId)
+                var isuser = new IdentityServerUser(user.Id)
                 {
-                    DisplayName = user.Username
+                    DisplayName = user.UserName
                 };
 
                 await HttpContext.SignInAsync(isuser, props);

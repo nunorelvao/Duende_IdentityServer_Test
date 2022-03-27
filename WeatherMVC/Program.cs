@@ -15,10 +15,10 @@ builder.Services.Configure<IdentityServerSetttings>(builder.Configuration.GetSec
 
 //Authentication with OpenId
 builder.Services.AddAuthentication(options =>
-   {
-       options.DefaultScheme = "cookie";
+   {       
+       options.DefaultScheme = "WeatherMVCCookie";
        options.DefaultChallengeScheme = "oidc";
-   }).AddCookie("cookie")
+   }).AddCookie("WeatherMVCCookie" , options => options.Cookie.Name = "WeatherMVCCookie")
    .AddOpenIdConnect("oidc", options =>
    {
        options.Authority = builder.Configuration["InteractiveServerSettings:AuthorityUrl"];

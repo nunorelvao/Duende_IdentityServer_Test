@@ -45,7 +45,7 @@ namespace WeatherMVC.Controllers
             return SignOut(new AuthenticationProperties
             {
                 RedirectUri = "/Home/Index"
-            }, "cookie", "oidc");
+            }, new[] { "oidc", "WeatherMVCCookie" });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -60,7 +60,7 @@ namespace WeatherMVC.Controllers
             using var client = new HttpClient();
 
             ////get token m2m(machine to machine)
-            //var tokenm2m = await _tokenService.GetToken("weatherapi.read");
+            var tokenm2m = await _tokenService.GetToken("weatherapi.read");
             //client.SetBearerToken(tokenm2m.AccessToken);
 
             //get token from Pkce method
