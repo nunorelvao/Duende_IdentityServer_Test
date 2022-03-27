@@ -1,16 +1,18 @@
 using Duende.IdentityServer;
+using Microsoft.EntityFrameworkCore;
 using Web_IDS.Models;
+
+
+var seed = args.Contains("/seed");
+if (seed)
+{
+    args = args.Except(new[] { "/seed" }).ToArray();
+}
 
 //get builder
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
-
-
-
-//inject configuration of middleware into builder
-
-var configIDS = new Config(builder.Configuration);
 
 
 builder.Services.AddAuthentication()
@@ -48,7 +50,11 @@ builder.Services.AddAuthentication()
           options.Scope.Add("user:email");
       });
 
-    builder.Services.AddIdentityServer(options =>
+//get connectionString from Config
+var connString = builder.Configuration.GetConnectionString("SQLiteConString");
+var asseblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+
+builder.Services.AddIdentityServer(options =>
         {
             options.Events.RaiseErrorEvents = true;
             options.Events.RaiseInformationEvents = true;
@@ -58,15 +64,36 @@ builder.Services.AddAuthentication()
             options.EmitStaticAudienceClaim = true;
 
         }).AddTestUsers(TestUsers.Users)
-         .AddInMemoryClients(configIDS.Clients)
-         .AddInMemoryApiResources(configIDS.ApiResources)
-         .AddInMemoryApiScopes(configIDS.ApiScopes)
-         .AddInMemoryIdentityResources(configIDS.IdentityResources)
-         .AddDeveloperSigningCredential();
+        //.AddInMemoryClients(Config.Clients) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryApiResources(Config.ApiResources) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryApiScopes(Config.ApiScopes) //This are in memory Stores to test and used in seed initial data
+        //.AddInMemoryIdentityResources(Config.IdentityResources) //This are in memory Stores to test and used in seed initial data
+
+        .AddConfigurationStore(options =>
+        {
+
+            options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
+        })
+        .AddOperationalStore(options =>
+        {
+            options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
+        })
+
+        .AddDeveloperSigningCredential();
 
 
 //build app
 var app = builder.Build();
+
+if (seed)
+{
+    Console.WriteLine("Start Seeding Database...");
+
+    Web_IDS.SeedData.EnsureSeedData(app);
+
+    Console.WriteLine("Done Seeding Database...");
+
+}
 
 
 app.UseStaticFiles();

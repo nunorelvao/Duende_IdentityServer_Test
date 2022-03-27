@@ -2,19 +2,9 @@
 
 namespace Web_IDS.Models
 {
-    public class Config
+    public static class Config
     {
-        private readonly IConfiguration _config;
-        private readonly string _m2mclientId;
-
-        public Config(IConfiguration config)
-        {
-            _config = config;
-
-            _m2mclientId = _config["m2mclientID"]; ///get value from secret (not so secret :) just to highlight 12050f74-2385-4d9f-8f50-4b75e2c0cf0e)
-        }
-
-        public IEnumerable<IdentityResource> IdentityResources => new[]
+        public static IEnumerable<IdentityResource> IdentityResources => new[]
           {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
@@ -46,7 +36,7 @@ namespace Web_IDS.Models
             }
           };
 
-        public IEnumerable<ApiScope> ApiScopes => new[]
+        public static IEnumerable<ApiScope> ApiScopes => new[]
         {
             new ApiScope("weatherapi.read"),
             new ApiScope("weatherapi.write"),
@@ -54,7 +44,7 @@ namespace Web_IDS.Models
             new ApiScope("api1.write"),
         };
 
-        public IEnumerable<ApiResource> ApiResources => new[]
+        public static IEnumerable<ApiResource> ApiResources => new[]
         {
           new ApiResource("weatherapi")
           {
@@ -71,7 +61,7 @@ namespace Web_IDS.Models
         };
 
 
-        public IEnumerable<Client> Clients => new[]
+        public static IEnumerable<Client> Clients => new[]
           {
 
             // m2m client credentials flow client (machine 2 machine eg:API)
@@ -81,7 +71,7 @@ namespace Web_IDS.Models
               ClientName = "Client Credentials Client",
 
               AllowedGrantTypes =  GrantTypes.ClientCredentials,
-              ClientSecrets = {new Secret(_m2mclientId.Sha256())},
+              ClientSecrets = {new Secret("12050f74-2385-4d9f-8f50-4b75e2c0cf0e".Sha256())},
 
               AllowedScopes = {"weatherapi.read", "weatherapi.write"}
             },
@@ -104,7 +94,7 @@ namespace Web_IDS.Models
               RequirePkce = true,
               //RequireConsent = true,
               AllowPlainTextPkce = false,
-              UserSsoLifetime = 15
+              //UserSsoLifetime = 15
 
             },
         };

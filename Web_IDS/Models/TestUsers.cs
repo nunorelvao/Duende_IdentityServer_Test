@@ -29,7 +29,6 @@ namespace Web_IDS.Models
                         Password = "admin",
                         Claims =
                         {
-                            new Claim(JwtClaimTypes.Subject, "test"),
                             new Claim(JwtClaimTypes.Role, "admin"),
                             new Claim(JwtClaimTypes.Name, "Nuno Relvao"),
                             new Claim(JwtClaimTypes.GivenName, "Nuno"),
@@ -47,7 +46,6 @@ namespace Web_IDS.Models
                         Password = "alice",
                         Claims =
                         {
-                            new Claim(JwtClaimTypes.Subject, "test"),
                             new Claim(JwtClaimTypes.Role, "user"),
                             new Claim(JwtClaimTypes.Name, "Alice Smith"),
                             new Claim(JwtClaimTypes.GivenName, "Alice"),
@@ -65,7 +63,6 @@ namespace Web_IDS.Models
                         Password = "bob",
                         Claims =
                         {
-                            new Claim(JwtClaimTypes.Subject, "test"),
                             new Claim(JwtClaimTypes.Role, "user"),
                             new Claim(JwtClaimTypes.Name, "Bob Smith"),
                             new Claim(JwtClaimTypes.GivenName, "Bob"),
