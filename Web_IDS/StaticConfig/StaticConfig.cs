@@ -14,25 +14,7 @@ namespace Web_IDS.StaticConfig
             new IdentityResource
             {
               Name = "identityresources",
-              //UserClaims = new List<string> {"sub",
-              //                              "name",
-              //                              "family_name",
-              //                              "given_name",
-              //                              "middle_name",
-              //                              "nickname",
-              //                              "preferred_username",
-              //                              "profile",
-              //                              "picture",
-              //                              "website",
-              //                              "gender",
-              //                              "birthdate",
-              //                              "zoneinfo",
-              //                              "locale",
-              //                              "updated_at",
-              //                              "role",
-              //                              "email"}
-
-              UserClaims = new List<string> {"role", "email"}
+              UserClaims = new List<string> {"role"}
             }
           };
 
@@ -73,7 +55,7 @@ namespace Web_IDS.StaticConfig
               AllowedGrantTypes =  GrantTypes.ClientCredentials,
               ClientSecrets = {new Secret("12050f74-2385-4d9f-8f50-4b75e2c0cf0e".Sha256())},
 
-              AllowedScopes = {"weatherapi.read", "weatherapi.write"}
+              AllowedScopes = {"weatherapi.read", "weatherapi.write"}              
             },
 
 
@@ -90,9 +72,9 @@ namespace Web_IDS.StaticConfig
               PostLogoutRedirectUris = {"https://localhost:7262/signout-callback-oidc"},
 
               AllowOfflineAccess = true,
-              AllowedScopes = {"openid", "profile", "identityresources", "weatherapi.read"},
+              AllowedScopes = {"openid", "profile", "identityresources", "weatherapi.read", "weatherapi.write"},
               RequirePkce = true,
-              //RequireConsent = true,
+               RequireConsent = true,
               AllowPlainTextPkce = false,
               //UserSsoLifetime = 15
 

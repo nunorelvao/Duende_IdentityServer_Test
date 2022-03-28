@@ -14,28 +14,27 @@ namespace Web_IDS.StaticConfig
 {
     public class SeedAspNetUsers
     {
-        private static ILogger? _logger;
         public static void EnsureUsersData(WebApplication app)
         {
-            _logger = app.Services.GetRequiredService<ILogger<SeedAspNetUsers>>();
+           var logger = app.Services.GetRequiredService<ILogger<SeedAspNetUsers>>();
 
             using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {                               
                
                 var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-                context.Database.Migrate();
+                context?.Database.Migrate();
                                
-                EnsureUsersData(context, scope);
+                EnsureUsersData(context, scope, logger);
             }
         }
 
-        private static void EnsureUsersData(ApplicationDbContext context, IServiceScope scope)
+        private static void EnsureUsersData(ApplicationDbContext? context, IServiceScope scope, ILogger? logger)
         {
 
 
-            if (!context.Users.Any())
+            if (context != null && !context.Users.Any())
             {
-                _logger?.LogDebug("Users being populated");
+                logger?.LogDebug("Users being populated");
                 foreach (var user in TestUsers.Users.ToList())
                 {
                     var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -84,7 +83,7 @@ namespace Web_IDS.StaticConfig
             }
             else
             {
-                _logger?.LogDebug("Users already populated");
+                logger?.LogDebug("Users already populated");
             }
 
         }

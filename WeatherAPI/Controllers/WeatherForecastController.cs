@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
+using System.Text.Json;
+using WeatherAPI.Extensions;
 
 namespace WeatherAPI.Controllers
 {
@@ -11,43 +14,54 @@ namespace WeatherAPI.Controllers
         private static readonly string[] Summaries = new[]
         {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+        };
+
+        const string apiReadScope = "weatherapi.read";
+        const string apiWriteScope = "weatherapi.write";
+        IAuthorizationService _authz;
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IAuthorizationService authz)
         {
             _logger = logger;
+            _authz = authz;
+        }
+        
+        [HttpGet(Name = "GetWeatherForecast")]
+        public async Task<IEnumerable<WeatherForecast>> GetAsync()
+        {
+            //using the policy set in authorizations although this returns a Http 500 by default  
+            await _authz.AuthorizeAsync(User, "apiread");
+
+            //kind of model validate but on scopes vaidate with extension (you can easly define return http code in extension)
+            HttpContext.VerifyUserHasAnyAcceptedScopeFromJwtToken(apiReadScope);
+
+            var res = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            })
+            .AsEnumerable<WeatherForecast>();
+                      
+            
+            return res;
+
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpPost(Name = "InsertWeather")]
+        public async Task<IActionResult> InsertWeatherAsync(IEnumerable<WeatherForecast> model)
         {
-            var httpContext = HttpContext;
-            bool? scopeValid = httpContext?.User?.Claims?.Any(c => c.Type == "scope" && c.Value.Contains("read"));
+            //using the policy set in authorizations although this returns a Http 500 by default  
+            await _authz.AuthorizeAsync(User, "apiwrite");
 
+            //kind of model validate but on scopes vaidate with extension (you can easly define return http code in extension)
+            HttpContext.VerifyUserHasAnyAcceptedScopeFromJwtToken(apiWriteScope);
 
-            if (scopeValid ?? false)
-            {
-                var res = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-                {
-                    Date = DateTime.Now.AddDays(index),
-                    TemperatureC = Random.Shared.Next(-20, 55),
-                    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-                })
-                .ToArray();
+            var sermodel = JsonSerializer.Serialize<IEnumerable<WeatherForecast>>(model);
 
-                return res;
-            }
-            else
-            {
-                if (httpContext != null)
-                    httpContext.Response.StatusCode = 401;
-
-                return new List<WeatherForecast>();
-            }
-
-
+            return Ok(sermodel);
         }
     }
 }

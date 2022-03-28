@@ -27,10 +27,10 @@ public class Index : PageModel
     private readonly SignInManager<ApplicationUser> _signInManager;
 
 
-    public ViewModel View { get; set; }
+    public ViewModel? View { get; set; }
         
     [BindProperty]
-    public InputModel Input { get; set; }
+    public InputModel? Input { get; set; }
         
     public Index(
         IIdentityServerInteractionService interaction,
@@ -56,7 +56,7 @@ public class Index : PageModel
     {
         await BuildModelAsync(returnUrl);
             
-        if (View.IsExternalLoginOnly)
+        if (View != null && View.IsExternalLoginOnly)
         {
             // we only have one option for logging in and it's an external provider
             return RedirectToPage("/ExternalLogin/Challenge", new { scheme = View.ExternalLoginScheme, returnUrl });
@@ -68,10 +68,10 @@ public class Index : PageModel
     public async Task<IActionResult> OnPost()
     {
         // check if we are in the context of an authorization request
-        var context = await _interaction.GetAuthorizationContextAsync(Input.ReturnUrl);
+        var context = await _interaction.GetAuthorizationContextAsync(Input?.ReturnUrl);
 
         // the user clicked the "cancel" button
-        if (Input.Button != "login")
+        if (Input != null && Input.Button != "login")
         {
             if (context != null)
             {
@@ -85,10 +85,10 @@ public class Index : PageModel
                 {
                     // The client is native, so this change in how to
                     // return the response is for better UX for the end user.
-                    return this.LoadingPage(Input.ReturnUrl);
+                    return this.LoadingPage(Input.ReturnUrl ?? "~/");
                 }
 
-                return Redirect(Input.ReturnUrl);
+                return Redirect(Input.ReturnUrl ?? "~/");
             }
             else
             {
@@ -99,19 +99,19 @@ public class Index : PageModel
 
         if (ModelState.IsValid)
         {
-            var user = await _signInManager.UserManager.FindByNameAsync(Input.Username);
+            var user = await _signInManager.UserManager.FindByNameAsync(Input?.Username);
 
             // validate username/password against in-memory store
             //if (_users.ValidateCredentials(Input.Username, Input.Password))
-            if (user != null && (await _signInManager.CheckPasswordSignInAsync(user, Input.Password, true)) == Microsoft.AspNetCore.Identity.SignInResult.Success)
+            if (user != null && (await _signInManager.CheckPasswordSignInAsync(user, Input?.Password, true)) == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
                 //var user = _users.FindByUsername(Input.Username);
                 await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.Client.ClientId));
 
                 // only set explicit expiration here if user chooses "remember me". 
                 // otherwise we rely upon expiration configured in cookie middleware.
-                AuthenticationProperties props = null;
-                if (LoginOptions.AllowRememberLogin && Input.RememberLogin)
+                AuthenticationProperties? props = null;
+                if (LoginOptions.AllowRememberLogin && (Input?.RememberLogin ?? false))
                 {
                     props = new AuthenticationProperties
                     {
@@ -134,19 +134,19 @@ public class Index : PageModel
                     {
                         // The client is native, so this change in how to
                         // return the response is for better UX for the end user.
-                        return this.LoadingPage(Input.ReturnUrl);
+                        return this.LoadingPage(Input?.ReturnUrl ?? "~/");
                     }
 
                     // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                    return Redirect(Input.ReturnUrl);
+                    return Redirect(Input?.ReturnUrl ?? "~/");
                 }
 
                 // request for a local page
-                if (Url.IsLocalUrl(Input.ReturnUrl))
+                if (Url.IsLocalUrl(Input?.ReturnUrl))
                 {
-                    return Redirect(Input.ReturnUrl);
+                    return Redirect(Input.ReturnUrl ?? "~/");
                 }
-                else if (string.IsNullOrEmpty(Input.ReturnUrl))
+                else if (string.IsNullOrEmpty(Input?.ReturnUrl))
                 {
                     return Redirect("~/");
                 }
@@ -157,12 +157,12 @@ public class Index : PageModel
                 }
             }
 
-            await _events.RaiseAsync(new UserLoginFailureEvent(Input.Username, "invalid credentials", clientId:context?.Client.ClientId));
+            await _events.RaiseAsync(new UserLoginFailureEvent(Input?.Username, "invalid credentials", clientId:context?.Client.ClientId));
             ModelState.AddModelError(string.Empty, LoginOptions.InvalidCredentialsErrorMessage);
         }
 
         // something went wrong, show form with error
-        await BuildModelAsync(Input.ReturnUrl);
+        await BuildModelAsync(Input?.ReturnUrl ?? "~/");
         return Page();
     }
         
@@ -186,7 +186,7 @@ public class Index : PageModel
 
             Input.Username = context?.LoginHint;
 
-            if (!local)
+            if (!local && context != null)
             {
                 View.ExternalProviders = new[] { new ViewModel.ExternalProvider { AuthenticationScheme = context.IdP } };
             }

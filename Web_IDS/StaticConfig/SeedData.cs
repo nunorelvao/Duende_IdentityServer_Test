@@ -8,98 +8,101 @@ namespace Web_IDS.StaticConfig
 {
     public class SeedData
     {
-        private static ILogger? _logger;
-        private static ILoggerFactory _loggerFactory = LoggerFactory.Create(c => c.SetMinimumLevel(LogLevel.Debug));
+       
         public static void EnsureSeedData(WebApplication app)
         {
-            _logger = _loggerFactory.CreateLogger("SeedData");
+            var logger = app.Services.GetRequiredService<ILogger<SeedData>>();
 
             using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {                               
-                scope.ServiceProvider.GetService<PersistedGrantDbContext>().Database.Migrate();
+                scope?.ServiceProvider?.GetService<PersistedGrantDbContext>()?.Database.Migrate();
 
-                var context = scope.ServiceProvider.GetService<ConfigurationDbContext>();
-                context.Database.Migrate();
+                var context = scope?.ServiceProvider.GetService<ConfigurationDbContext>();
+                context?.Database.Migrate();
                
                 
-                EnsureSeedData(context);
+                EnsureSeedData(context ?? null, logger);
             }
         }
 
-        private static void EnsureSeedData(ConfigurationDbContext context)
+        private static void EnsureSeedData(ConfigurationDbContext? context, ILogger? logger)
         {
-            if (!context.Clients.Any())
+            if (context != null)
             {
-                _logger.LogDebug("Clients being populated");
-                foreach (var client in StaticConfig.Clients.ToList())
+
+                if (!context.Clients.Any())
                 {
-                    context.Clients.Add(client.ToEntity());
+                    logger?.LogDebug("Clients being populated");
+                    foreach (var client in StaticConfig.Clients.ToList())
+                    {
+                        context.Clients.Add(client.ToEntity());
+                    }
+                    context.SaveChanges();
                 }
-                context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogDebug("Clients already populated");
-            }
-
-            if (!context.IdentityResources.Any())
-            {
-                _logger.LogDebug("IdentityResources being populated");
-                foreach (var resource in StaticConfig.IdentityResources.ToList())
+                else
                 {
-                    context.IdentityResources.Add(resource.ToEntity());
+                    logger?.LogDebug("Clients already populated");
                 }
-                context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogDebug("IdentityResources already populated");
-            }
 
-            if (!context.ApiScopes.Any())
-            {
-                _logger.LogDebug("ApiScopes being populated");
-                foreach (var resource in StaticConfig.ApiScopes.ToList())
+                if (!context.IdentityResources.Any())
                 {
-                    context.ApiScopes.Add(resource.ToEntity());
+                    logger?.LogDebug("IdentityResources being populated");
+                    foreach (var resource in StaticConfig.IdentityResources.ToList())
+                    {
+                        context.IdentityResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
                 }
-                context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogDebug("ApiScopes already populated");
-            }
-
-            if (!context.ApiResources.Any())
-            {
-                _logger.LogDebug("ApiResources being populated");
-                foreach (var resource in StaticConfig.ApiResources.ToList())
+                else
                 {
-                    context.ApiResources.Add(resource.ToEntity());
+                    logger?.LogDebug("IdentityResources already populated");
                 }
-                context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogDebug("ApiResources already populated");
-            }
 
-
-            if (!context.IdentityProviders.Any())
-            {
-                _logger.LogDebug("OIDC IdentityProviders being populated");
-                context.IdentityProviders.Add(new OidcProvider
+                if (!context.ApiScopes.Any())
                 {
-                    Scheme = "demoidsrv",
-                    DisplayName = "IdentityServer",
-                    Authority = "https://demo.duendesoftware.com",
-                    ClientId = "login",
-                }.ToEntity());
-                context.SaveChanges();
-            }
-            else
-            {
-                _logger.LogDebug("OIDC IdentityProviders already populated");
+                    logger?.LogDebug("ApiScopes being populated");
+                    foreach (var resource in StaticConfig.ApiScopes.ToList())
+                    {
+                        context.ApiScopes.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+                else
+                {
+                    logger?.LogDebug("ApiScopes already populated");
+                }
+
+                if (!context.ApiResources.Any())
+                {
+                    logger?.LogDebug("ApiResources being populated");
+                    foreach (var resource in StaticConfig.ApiResources.ToList())
+                    {
+                        context.ApiResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+                else
+                {
+                    logger?.LogDebug("ApiResources already populated");
+                }
+
+
+                if (!context.IdentityProviders.Any())
+                {
+                    logger?.LogDebug("OIDC IdentityProviders being populated");
+                    context.IdentityProviders.Add(new OidcProvider
+                    {
+                        Scheme = "demoidsrv",
+                        DisplayName = "IdentityServer",
+                        Authority = "https://demo.duendesoftware.com",
+                        ClientId = "login",
+                    }.ToEntity());
+                    context.SaveChanges();
+                }
+                else
+                {
+                    logger?.LogDebug("OIDC IdentityProviders already populated");
+                }
             }
         }
     }

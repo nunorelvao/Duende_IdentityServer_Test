@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews( config =>
 {
     config.Filters.Add(new BaseFilter());
-});
+})
+ .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
+
 
 //JWTTokenBearer Auth to m2m (machine to machine) api call
 builder.Services.Configure<IdentityServerSetttings>(builder.Configuration.GetSection(nameof(IdentityServerSetttings)));
@@ -26,6 +28,7 @@ builder.Services.AddAuthentication(options =>
        options.ClientSecret = builder.Configuration["InteractiveServerSettings:ClientSecret"];
        options.Scope.Add(builder.Configuration["InteractiveServerSettings:Scopes:0"]);
        options.Scope.Add(builder.Configuration["InteractiveServerSettings:Scopes:1"]);
+       options.Scope.Add(builder.Configuration["InteractiveServerSettings:Scopes:2"]);
 
        options.ResponseType = "code";
        options.UsePkce = true;

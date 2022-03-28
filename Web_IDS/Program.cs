@@ -15,7 +15,7 @@ if (seed)
 //get builder
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
+
 
 
 builder.Services.AddAuthentication()
@@ -23,7 +23,7 @@ builder.Services.AddAuthentication()
        {
            options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
            options.ClientId = builder.Configuration["google.clientid"];
-           options.ClientSecret = builder.Configuration["google.clientsecret"];
+           options.ClientSecret = builder.Configuration["google.clientsecret"];           
        })
     .AddTwitter(options =>
       {
@@ -72,23 +72,23 @@ builder.Services.AddIdentityServer(options =>
             options.EmitStaticAudienceClaim = true;
 
         })
-        //.AddTestUsers(TestUsers.Users) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryClients(StaticConfig.Clients) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryApiResources(StaticConfig.ApiResources) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryApiScopes(StaticConfig.ApiScopes) //This are in memory Stores to test and used in seed initial data
-        //.AddInMemoryIdentityResources(StaticConfig.IdentityResources) //This are in memory Stores to test and used in seed initial data
+        //.AddTestUsers(TestUsers.Users) //This are in memory Stores to test and used in seed initial data       
         .AddAspNetIdentity<ApplicationUser>()
-        .AddConfigurationStore(options =>
-        {
-
-            options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
-        })
-        .AddOperationalStore(options =>
-        {
-            options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
-        })
-
+        .AddInMemoryClients(StaticConfig.Clients) //This are in memory Stores to test and used in seed initial data
+        .AddInMemoryApiResources(StaticConfig.ApiResources) //This are in memory Stores to test and used in seed initial data
+        .AddInMemoryApiScopes(StaticConfig.ApiScopes) //This are in memory Stores to test and used in seed initial data
+        .AddInMemoryIdentityResources(StaticConfig.IdentityResources) //This are in memory Stores to test and used in seed initial data
+            //.AddConfigurationStore(options =>
+            //{
+            //    options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
+            //})
+            //.AddOperationalStore(options =>
+            //{
+            //    options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
+            //})
         .AddDeveloperSigningCredential();
+
+builder.Services.AddRazorPages();
 
 //Add DbContext for Identity
 var aspNetCoreIdentityconnString = builder.Configuration.GetConnectionString("SQLiteIdentityAspNetCoreConString");
@@ -106,7 +106,7 @@ if (seed)
 {
     Console.WriteLine("Start Seeding Database...");
 
-   // Web_IDS.StaticConfig.SeedData.EnsureSeedData(app);
+    Web_IDS.StaticConfig.SeedData.EnsureSeedData(app);
 
     Console.WriteLine("Done Seeding Database...");
 
@@ -115,9 +115,6 @@ if (seed)
     Web_IDS.StaticConfig.SeedAspNetUsers.EnsureUsersData(app);
 
     Console.WriteLine("Done Identity AspNet Seeding Database...");
-
-
-
 }
 
 

@@ -14,9 +14,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = "https://localhost:7270";
         options.Audience = "weatherapi";
-        
+                
         options.TokenValidationParameters.ValidTypes = new [] { "at+jwt" };   
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("apiread", policy => policy.RequireClaim("scope", "weatherapi.read"));
+    
+    options.AddPolicy("apiwrite", policy => policy.RequireClaim("scope", "weatherapi.write"));
+});
 
 var app = builder.Build();
 
