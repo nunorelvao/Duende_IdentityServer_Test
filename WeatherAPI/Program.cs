@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -14,14 +14,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = "https://localhost:7270";
         options.Audience = "weatherapi";
-                
-        options.TokenValidationParameters.ValidTypes = new [] { "at+jwt" };   
+
+        options.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
     });
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("apiread", policy => policy.RequireClaim("scope", "weatherapi.read"));
-    
+
     options.AddPolicy("apiwrite", policy => policy.RequireClaim("scope", "weatherapi.write"));
 });
 

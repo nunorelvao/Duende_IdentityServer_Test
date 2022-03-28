@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using WeatherMVC.Models;
 using WeatherMVC.Services;
+using WeatherMVC.Utils;
 
 namespace WeatherMVC.Controllers
 {
@@ -77,7 +78,7 @@ namespace WeatherMVC.Controllers
                 var model = await result.Content.ReadAsStringAsync();
 
                 
-                var weatherData = JsonSerializer.Deserialize<List<WeatherDataModel>>(model);
+                var weatherData = JsonTextSerializerExtensions.DeserializeFromJson<List<WeatherDataModel>>(model);
 
 
                 return View(weatherData);

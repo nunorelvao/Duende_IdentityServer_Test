@@ -44,9 +44,8 @@ namespace WeatherAPI.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .AsEnumerable<WeatherForecast>();
-                      
-            
-            return res;
+
+            return res; 
 
         }
 

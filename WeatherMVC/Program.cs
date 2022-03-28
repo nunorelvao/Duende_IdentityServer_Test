@@ -8,8 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews( config =>
 {
     config.Filters.Add(new BaseFilter());
-})
- .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
+}).AddJsonOptions(opt => opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true);
 
 
 //JWTTokenBearer Auth to m2m (machine to machine) api call
