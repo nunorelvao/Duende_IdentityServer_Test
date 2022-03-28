@@ -1,4 +1,6 @@
-namespace DuendeIdentityServer.Pages.Device;
+using System.Collections.Generic;
+
+namespace IdentityServerHost.Pages.Device;
 
 public class InputModel
 {

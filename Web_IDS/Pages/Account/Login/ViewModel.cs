@@ -2,7 +2,11 @@
 // See LICENSE in the project root for license information.
 
 
-namespace DuendeIdentityServer.Pages.Login;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace IdentityServerHost.Pages.Login;
 
 public class ViewModel
 {

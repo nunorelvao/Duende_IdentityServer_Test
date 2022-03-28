@@ -2,7 +2,9 @@
 // See LICENSE in the project root for license information.
 
 
-namespace DuendeIdentityServer.Pages.Consent;
+using System.Collections.Generic;
+
+namespace IdentityServerHost.Pages.Consent;
 
 public class InputModel
 {

@@ -2,7 +2,9 @@
 // See LICENSE in the project root for license information.
 
 
-namespace DuendeIdentityServer.Pages.Ciba;
+using System.Collections.Generic;
+
+namespace IdentityServerHost.Pages.Ciba;
 
 public class InputModel
 {

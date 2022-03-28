@@ -2,7 +2,7 @@
 // See LICENSE in the project root for license information.
 
 
-namespace DuendeIdentityServer.Pages.Device;
+namespace IdentityServerHost.Pages.Device;
 
 public class DeviceOptions
 {

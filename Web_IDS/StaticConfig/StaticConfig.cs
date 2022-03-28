@@ -74,7 +74,8 @@ namespace Web_IDS.StaticConfig
               AllowOfflineAccess = true,
               AllowedScopes = {"openid", "profile", "identityresources", "weatherapi.read", "weatherapi.write"},
               RequirePkce = true,
-               RequireConsent = true,
+              RequireConsent = true,
+              ConsentLifetime = 60,
               AllowPlainTextPkce = false,
               //UserSsoLifetime = 15
 

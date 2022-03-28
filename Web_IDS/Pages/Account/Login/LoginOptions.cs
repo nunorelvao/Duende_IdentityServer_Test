@@ -1,4 +1,6 @@
-namespace DuendeIdentityServer.Pages.Login;
+using System;
+
+namespace IdentityServerHost.Pages.Login;
 
 public class LoginOptions
 {
