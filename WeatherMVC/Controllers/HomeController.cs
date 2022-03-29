@@ -76,10 +76,11 @@ namespace WeatherMVC.Controllers
             if (result.IsSuccessStatusCode)
             {
                 var model = await result.Content.ReadAsStringAsync();
+                                
+                var weatherData = model.DeserializeFromJson<List<WeatherDataModel>>(true);
 
-                
-                var weatherData = JsonTextSerializerExtensions.DeserializeFromJson<List<WeatherDataModel>>(model);
-
+                //use extension method on IeNumerable, just to demonstrate
+                var filterWeatherDataLessThan20c = weatherData?.OnlyLessThan20c();
 
                 return View(weatherData);
             }

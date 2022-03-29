@@ -24,11 +24,12 @@ namespace Web_IDS.StaticConfig
                 {
                     new TestUser
                     {
-                        SubjectId = "43546",
+                        SubjectId = "1",
                         Username = "admin",
                         Password = "Admin!123",
                         Claims =
                         {
+                             new Claim(JwtClaimTypes.Subject, "1"), //required for policy admin
                             new Claim(JwtClaimTypes.Role, "admin"),
                             new Claim(JwtClaimTypes.Name, "Nuno Relvao"),
                             new Claim(JwtClaimTypes.GivenName, "Nuno"),

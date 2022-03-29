@@ -1,5 +1,9 @@
 using Duende.IdentityServer;
+using IdentityServerHost.Pages.Admin.ApiScopes;
+using IdentityServerHost.Pages.Admin.Clients;
+using IdentityServerHost.Pages.Admin.IdentityScopes;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Web_IDS.Data;
 using Web_IDS.Models;
@@ -41,6 +45,9 @@ internal static class HostingExtensions
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
+
+                options.Caching.ClientStoreExpiration = TimeSpan.FromMinutes(5);
+                options.Caching.ResourceStoreExpiration = TimeSpan.FromMinutes(5);
             })
             //.AddInMemoryClients(StaticConfig.Clients) //This are in memory Stores to test and used in seed initial data
             //.AddInMemoryApiResources(StaticConfig.ApiResources) //This are in memory Stores to test and used in seed initial data
@@ -54,6 +61,8 @@ internal static class HostingExtensions
             {
                 options.ConfigureDbContext = builder => builder.UseSqlite(connString, options => options.MigrationsAssembly(asseblyName));
             })
+            .AddInMemoryCaching() //Currently uses InMemoryCache , but desireable in production should use eg NCache or RedisCache (https://docs.microsoft.com/en-us/aspnet/core/performance/caching/memory?view=aspnetcore-6.0)
+            .AddConfigurationStoreCache() // this is a cache you will want in production to reduce load on and requests to the DB
             .AddAspNetIdentity<ApplicationUser>();
 
 
@@ -91,6 +100,21 @@ internal static class HostingExtensions
               //options.EnterpriseDomain = builder.Configuration["github.enterprisedomain"];
               options.Scope.Add("user:email");
           });
+
+        // this adds the necessary config for the simple admin/config pages
+        {
+            builder.Services.AddAuthorization(options =>
+                options.AddPolicy("admin",
+                    policy => policy.RequireClaim("sub", "1"))
+            );
+
+            builder.Services.Configure<RazorPagesOptions>(options =>
+                options.Conventions.AuthorizeFolder("/Admin", "admin"));
+
+            builder.Services.AddTransient<ClientRepository>();
+            builder.Services.AddTransient<IdentityScopeRepository>();
+            builder.Services.AddTransient<ApiScopeRepository>();
+        }
 
 
         return builder.Build();
